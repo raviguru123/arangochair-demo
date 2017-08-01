@@ -1,8 +1,30 @@
 {
-  "dependencies": {
-    "arangochair": "4.0.2",
-    "body-parser": "^1.16.1",
-    "express": "4.14.1",
-    "fastango3": "^3.0.0"
-  }
+    "dependencies": {
+        "request-easy": "^2.0.1"
+    },
+    "name": "arangochair",
+    "version": "4.0.2",
+    "description": "`arangochair` pushs ArangoDB changes in realtime to you",
+    "main": "index.js",
+    "devDependencies": {},
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/baslr/arangochair.git"
+    },
+    "keywords": [
+        "arangodb",
+        "push",
+        "realtime",
+        "watch",
+        "monitor"
+    ],
+    "author": "Manuel Baesler",
+    "license": "AGPL-3.0",
+    "bugs": {
+        "url": "https://github.com/baslr/arangochair/issues"
+    },
+    "homepage": "https://github.com/baslr/arangochair#readme"
 }

@@ -1,59 +1,39 @@
-const fastango = require('fastango3')('http://127.0.0.1:8529');
-const arangochair = require('arangochair');
-var bodyParser = require('body-parser');
-const express = require('express');
-const app = express();
-app.use(bodyParser.json());
-app.listen(3000);
+const arangochair = require('./chair');
 
-app.use(express.static(__dirname + '/public'));
+//const no4 = new arangochair('http://127.0.0.1:8529/'); // ArangoDB node to monitor
 
-let sses = [];
-
-app.use( (req, res, next) => {
-    if ('/sse' === req.url) {
-        sses.push(res);
-        res.setHeader('Content-Type', 'text/event-stream');
-        res.on('close', () => {
-            console.log('sse close');
-            const idx = sses.indexOf(res);
-            if (-1 === idx) return;
-            sses.splice(idx, 1);
-            console.log(sses.length);
-        });
-
-        res.write('data: initial\n\n');
-        return;
-    }
-
-    next();
-});
-
-app.post('/tweet', (req, res) => {
-    console.dir(req.body);
-    fastango.tweets.save(JSON.stringify(req.body), (...a) => console.log(a) );
-    res.sendStatus(204);
-});
-
-
-const no4 = new arangochair('http://127.0.0.1:8529'); // ArangoDB node to monitor
-
-no4.subscribe({collection:'tweets'});
+const no4 = new arangochair('http://127.0.0.1:8529/goparties1'); // ArangoDB node to monitor, with database name
+// const no4 = new arangochair({
+//     "url": "http://root:poiqwe@127.0.0.1:8529",
+//     "database": "goparties1"
+// });
+//const no4 = new arangochair('http://root:poiqwe@127.0.0.1:8529/goparties1'); // ArangoDB node to monitor, with database name
+no4.subscribe({ collection: 'party' });
 no4.start();
-no4.on('tweets', (docIn, type) => {
-    const doc = JSON.parse(docIn);
-    console.log(type);
+no4.on('party', (doc, type) => {
+    console.log("change some data", doc.toString('utf8'));
+    // do something awesome
 
-    const message = 'event: ' + type + '\ndata: ' + JSON.stringify(doc) + '\n\n';
-    for(const sse of sses) {
-        sse.write(message);
-    }
+    // doc:Buffer
+    // type:'insert/update'|'delete'
 });
 
 no4.on('error', (err, httpStatus, headers, body) => {
-    console.log('on error', err);
     // arangochair stops on errors
     // check last http request
     no4.start();
 });
 
+
+// subscribe to all events in the party collection
+// no4.subscribe('party');
+
+// // explicit
+// no4.subscribe({ collection: 'party', events: ['insert/update', 'delete'] });
+
+
+// // subscribe the party collection with only the delete event
+// no4.subscribe({ collection: 'party', events: ['delete'] });
+
+// // subscribe the party collection with only the delete event on key myKey
+// no4.subscribe({ collection: 'party', events: ['delete'], keys: ['myKey'] });
